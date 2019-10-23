@@ -1,0 +1,58 @@
+stages:
+  - build
+
+build_linux:
+  stage: build
+  tags:
+    - mason-cli-deploy
+  image: docker:19
+  services:
+    - docker:19-dind
+  script:
+    - |
+      if [[ -z "$CI_COMMIT_TAG" ]]; then
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_SHORT_SHA}
+      else
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_TAG}
+      fi
+    - echo "Logging to GitLab Container Registry with CI credentials..."
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker pull "$CI_APPLICATION_REPOSITORY:latest" || true
+    - echo "Building Docker image $CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG..."
+    - docker build --progress plain --cache-from "$CI_APPLICATION_REPOSITORY:latest" -t "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" -f Dockerfile.linux .
+    - docker tag "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" "$CI_APPLICATION_REPOSITORY:latest"
+    - docker push "$CI_APPLICATION_REPOSITORY-linux:$CI_APPLICATION_TAG"
+    - docker push "$CI_APPLICATION_REPOSITORY-linux:latest"
+  only:
+    - master
+    - tags
+
+build_windows:
+  stage: build
+  tags:
+    - mason-cli-deploy
+  image: docker:19
+  services:
+    - docker:19-dind
+  script:
+    - |
+      if [[ -z "$CI_COMMIT_TAG" ]]; then
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_SHORT_SHA}
+      else
+        export CI_APPLICATION_REPOSITORY=${CI_APPLICATION_REPOSITORY:-$CI_REGISTRY_IMAGE}
+        export CI_APPLICATION_TAG=${CI_APPLICATION_TAG:-$CI_COMMIT_TAG}
+      fi
+    - echo "Logging to GitLab Container Registry with CI credentials..."
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker pull "$CI_APPLICATION_REPOSITORY:latest" || true
+    - echo "Building Docker image $CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG..."
+    - docker build --progress plain --cache-from "$CI_APPLICATION_REPOSITORY:latest" -t "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" -f Dockerfile.windows .
+    - docker tag "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" "$CI_APPLICATION_REPOSITORY:latest"
+    - docker push "$CI_APPLICATION_REPOSITORY-windows:$CI_APPLICATION_TAG"
+    - docker push "$CI_APPLICATION_REPOSITORY-windows:latest"
+  only:
+    - master
+    - tags

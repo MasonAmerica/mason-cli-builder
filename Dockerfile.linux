@@ -1,0 +1,14 @@
+# Use an old Ubuntu version for backwards compatibility reasons. If a binary is compiled on
+# Ubuntu X, it can only be used on Ubuntu versions >= X.
+FROM ubuntu:16.04
+
+RUN apt-get update
+RUN apt-get install -y software-properties-common
+
+RUN add-apt-repository ppa:deadsnakes/ppa
+RUN apt-get update
+RUN apt-get install -y python3.7 python3-pip
+RUN python3 -m pip install --upgrade pip
+RUN pip3 install pyinstaller
+
+WORKDIR home
