@@ -2,13 +2,18 @@
 # Ubuntu X, it can only be used on Ubuntu versions >= X.
 FROM ubuntu:16.04
 
-RUN apt-get update
-RUN apt-get install -y software-properties-common
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y software-properties-common \
+    && add-apt-repository ppa:deadsnakes/ppa \
+    && apt-get update \
+    && apt-get install --no-install-recommends -y \
+        build-essential \
+        python3.7 \
+        python3-dev \
+        python3-pip \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN add-apt-repository ppa:deadsnakes/ppa
-RUN apt-get update
-RUN apt-get install -y python3.7 python3-pip
-RUN python3 -m pip install --upgrade pip
-RUN pip3 install pyinstaller
+RUN python3 -m pip install --no-cache-dir --upgrade pip
+RUN pip3 install --no-cache-dir pyinstaller
 
 WORKDIR home

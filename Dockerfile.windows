@@ -1,27 +1,38 @@
 FROM ubuntu:18.04
 
 RUN dpkg --add-architecture i386
-RUN apt-get update
-RUN apt-get install -y software-properties-common curl wget zip unzip
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        software-properties-common \
+        curl \
+        gpg-agent \
+        wget \
+        zip \
+        unzip \
+    && wget -qO - https://dl.winehq.org/wine-builds/winehq.key | apt-key add - \
+    && apt-add-repository 'deb http://dl.winehq.org/wine-builds/ubuntu/ xenial main' \
+    && apt-get update \
+    && echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections \
+    && apt-get install -y --no-install-recommends winehq-stable \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN wget -qO - https://dl.winehq.org/wine-builds/winehq.key | apt-key add -
-RUN apt-add-repository 'deb http://dl.winehq.org/wine-builds/ubuntu/ xenial main'
-RUN apt-get update
-RUN echo ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true | debconf-set-selections
-RUN apt-get install -y winehq-stable
-
-RUN curl -o /tmp/exe.msi https://www.python.org/ftp/python/3.7.4/win32/exe.msi
-RUN curl -o /tmp/core.msi https://www.python.org/ftp/python/3.7.4/win32/core.msi
-RUN curl -o /tmp/lib.msi https://www.python.org/ftp/python/3.7.4/win32/lib.msi
-RUN curl -o /tmp/dev.msi https://www.python.org/ftp/python/3.7.4/win32/dev.msi
-
-RUN wine msiexec /i /tmp/exe.msi TargetDir=C:\Python37 /L*v /tmp/log.txt
-RUN wine msiexec /i /tmp/core.msi TargetDir=C:\Python37 /L*v /tmp/log.txt
-RUN wine msiexec /i /tmp/lib.msi TargetDir=C:\Python37 /L*v /tmp/log.txt
-RUN wine msiexec /i /tmp/dev.msi TargetDir=C:\Python37 /L*v /tmp/log.txt
-
-RUN curl -o /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
-RUN PYTHONHASHSEED=8 wine ~/.wine/drive_c/Python37/python.exe /tmp/get-pip.py
-RUN PYTHONHASHSEED=8 wine ~/.wine/drive_c/Python37/python.exe -m pip install --no-use-pep517 PyInstaller
+RUN curl -o /tmp/exe.msi https://www.python.org/ftp/python/3.7.4/win32/exe.msi \
+    && curl -o /tmp/core.msi https://www.python.org/ftp/python/3.7.4/win32/core.msi \
+    && curl -o /tmp/lib.msi https://www.python.org/ftp/python/3.7.4/win32/lib.msi \
+    && curl -o /tmp/dev.msi https://www.python.org/ftp/python/3.7.4/win32/dev.msi \
+    && wine msiexec /i /tmp/exe.msi TargetDir=C:\Python37 /L*v /tmp/log.txt \
+    && wine msiexec /i /tmp/core.msi TargetDir=C:\Python37 /L*v /tmp/log.txt \
+    && wine msiexec /i /tmp/lib.msi TargetDir=C:\Python37 /L*v /tmp/log.txt \
+    && wine msiexec /i /tmp/dev.msi TargetDir=C:\Python37 /L*v /tmp/log.txt \
+    && curl -o /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py \
+    && PYTHONHASHSEED=8 wine ~/.wine/drive_c/Python37/python.exe /tmp/get-pip.py \
+    && PYTHONHASHSEED=8 wine ~/.wine/drive_c/Python37/python.exe -m pip install --no-use-pep517 PyInstaller \
+    && rm \
+        /tmp/exe.msi \
+        /tmp/core.msi \
+        /tmp/lib.msi \
+        /tmp/dev.msi \
+        /tmp/log.txt \
+        /tmp/get-pip.py
 
 WORKDIR home
