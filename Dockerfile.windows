@@ -1,5 +1,3 @@
-# Use an old Ubuntu version for backwards compatibility reasons. If a binary is compiled on
-# Ubuntu X, it can only be used on Ubuntu versions >= X.
 FROM ubuntu:18.04
 
 RUN dpkg --add-architecture i386
