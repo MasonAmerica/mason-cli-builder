@@ -4,7 +4,7 @@ stages:
 build_linux:
   stage: build
   tags:
-    - mason-cli-deploy
+    - mason-deploy
   image: docker:19
   services:
     - docker:19-dind
@@ -32,7 +32,7 @@ build_linux:
 build_windows:
   stage: build
   tags:
-    - mason-cli-deploy
+    - mason-deploy
   image: docker:19
   services:
     - docker:19-dind
