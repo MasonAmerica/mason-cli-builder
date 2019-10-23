@@ -19,10 +19,10 @@ build_linux:
       fi
     - echo "Logging to GitLab Container Registry with CI credentials..."
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
-    - docker pull "$CI_APPLICATION_REPOSITORY:latest" || true
-    - echo "Building Docker image $CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG..."
-    - docker build --progress plain --cache-from "$CI_APPLICATION_REPOSITORY:latest" -t "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" -f Dockerfile.linux .
-    - docker tag "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" "$CI_APPLICATION_REPOSITORY:latest"
+    - docker pull "$CI_APPLICATION_REPOSITORY-linux:latest" || true
+    - echo "Building Docker image $CI_APPLICATION_REPOSITORY-linux:$CI_APPLICATION_TAG..."
+    - docker build --progress plain --cache-from "$CI_APPLICATION_REPOSITORY-linux:latest" -t "$CI_APPLICATION_REPOSITORY-linux:$CI_APPLICATION_TAG" -f Dockerfile.linux .
+    - docker tag "$CI_APPLICATION_REPOSITORY-linux:$CI_APPLICATION_TAG" "$CI_APPLICATION_REPOSITORY-linux:latest"
     - docker push "$CI_APPLICATION_REPOSITORY-linux:$CI_APPLICATION_TAG"
     - docker push "$CI_APPLICATION_REPOSITORY-linux:latest"
   only:
@@ -47,10 +47,10 @@ build_windows:
       fi
     - echo "Logging to GitLab Container Registry with CI credentials..."
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
-    - docker pull "$CI_APPLICATION_REPOSITORY:latest" || true
-    - echo "Building Docker image $CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG..."
-    - docker build --progress plain --cache-from "$CI_APPLICATION_REPOSITORY:latest" -t "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" -f Dockerfile.windows .
-    - docker tag "$CI_APPLICATION_REPOSITORY:$CI_APPLICATION_TAG" "$CI_APPLICATION_REPOSITORY:latest"
+    - docker pull "$CI_APPLICATION_REPOSITORY-windows:latest" || true
+    - echo "Building Docker image $CI_APPLICATION_REPOSITORY-windows:$CI_APPLICATION_TAG..."
+    - docker build --progress plain --cache-from "$CI_APPLICATION_REPOSITORY-windows:latest" -t "$CI_APPLICATION_REPOSITORY-windows:$CI_APPLICATION_TAG" -f Dockerfile.windows .
+    - docker tag "$CI_APPLICATION_REPOSITORY-windows:$CI_APPLICATION_TAG" "$CI_APPLICATION_REPOSITORY-windows:latest"
     - docker push "$CI_APPLICATION_REPOSITORY-windows:$CI_APPLICATION_TAG"
     - docker push "$CI_APPLICATION_REPOSITORY-windows:latest"
   only:
